@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "environment": [],
+            "program": "${workspaceFolder}\\build\\${workspaceFolderBasename}.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}\\content"
+        }
+    ]
+}

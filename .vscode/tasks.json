@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build (build.bat)",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "${workspaceFolder}\\scripts\\clean.bat & ${workspaceFolder}\\scripts\\shell.bat & ${workspaceFolder}\\scripts\\build.bat"
+            ],
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "Clean (clean.bat)",
+            "type": "shell",
+            "command": "${workspaceFolder}\\scripts\\clean.bat",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
