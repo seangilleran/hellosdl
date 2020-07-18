@@ -1,8 +1,8 @@
 ::@echo off
 
-set outputExe=HelloCPP
+set outputExe=HelloSDL
 set files=..\code\main.cpp
-set libs=
+set libs=SDL2.lib SDL2main.lib
 
 set buildDir=%~dp0..\build
 if not exist %buildDir% mkdir %buildDir%
@@ -17,6 +17,6 @@ set linkFlags=/link /SUBSYSTEM:CONSOLE
 cl %compileFlags% %files% %libs% %linkFlags%
 
 :: Copy dependencies...
-:: xcopy /y ..\external\{}.dll .
+xcopy /y ..\external\SDL2\lib\x64\SDL2.dll .
 
 popd

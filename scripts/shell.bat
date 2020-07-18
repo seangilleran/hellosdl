@@ -7,5 +7,5 @@ cd /d %scriptsDir%..
 call "C:\Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
 set path=%scriptsDir%;%path%;
-set INCLUDE=%scriptsDir%;%INCLUDE%
-set LIB=%scriptsDir%;%LIB%
+set INCLUDE=%scriptsDir%;..\external\SDL2\include;%INCLUDE%
+set LIB=%scriptsDir%;..\external\SDL2\lib\x64;%LIB%
