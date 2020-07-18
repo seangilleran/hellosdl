@@ -1,7 +1,7 @@
 ::@echo off
 
 set outputExe=HelloSDL
-set files=..\code\main.cpp
+set files=..\source\main.cpp
 set libs=SDL2.lib SDL2main.lib
 
 set buildDir=%~dp0..\build
