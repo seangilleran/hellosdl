@@ -3,6 +3,7 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include "cleanup.h"
 
@@ -22,21 +23,11 @@ void logSDLError(std::ostream &os, const std::string &msg)
  */
 SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
 {
-    SDL_Texture *texture = nullptr;
-
     std::string filename = "..\\content\\" + file;
-    SDL_Surface *bmp = SDL_LoadBMP(filename.c_str());
-    if (bmp == nullptr)
-    {
-        logSDLError(std::cerr, "SDL_LoadBMP");
-        return texture;
-    }
-
-    texture = SDL_CreateTextureFromSurface(renderer, bmp);
-    SDL_FreeSurface(bmp);
+    SDL_Texture *texture = IMG_LoadTexture(renderer, filename.c_str());
     if (texture == nullptr)
     {
-        logSDLError(std::cerr, "SDL_CreateTextureFromRenderer");
+        logSDLError(std::cerr, "IMG_LoadTexture");
         return texture;
     }
 
@@ -56,19 +47,6 @@ void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
 
     SDL_QueryTexture(texture, NULL, NULL, &destination.w, &destination.h);
     SDL_RenderCopy(renderer, texture, NULL, &destination);
-}
-
-/**
- * Tile texture to fit screen.
- */
-void tileTexture(SDL_Texture *texture, SDL_Renderer *renderer)
-{
-    int width, height;
-    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-    renderTexture(texture, renderer, 0, 0);
-    renderTexture(texture, renderer, width, 0);
-    renderTexture(texture, renderer, 0, height);
-    renderTexture(texture, renderer, width, height);
 }
 
 
@@ -110,9 +88,8 @@ int main()
     }
 
     // Load bitmap.
-    SDL_Texture *background = loadTexture("hello2.bmp", renderer);
     SDL_Texture *texture = loadTexture("hello.bmp", renderer);
-    if (background == nullptr || texture == nullptr)
+    if (texture == nullptr)
     {
         cleanup(renderer, window);
         SDL_Quit();
@@ -123,14 +100,13 @@ int main()
     for (auto i = 0; i < 3; ++i)
     {
         SDL_RenderClear(renderer);
-        tileTexture(background, renderer);
         renderTexture(texture, renderer, 170, 90);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
     }
 
     // Clean up.
-    cleanup(background, texture, renderer, window);
+    cleanup(texture, renderer, window);
     SDL_Quit();
     return 0;
 }
