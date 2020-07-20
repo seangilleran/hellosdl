@@ -23,30 +23,41 @@ void logSDLError(std::ostream &os, const std::string &msg)
  */
 SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
 {
-    std::string filename = "..\\content\\" + file;
-    SDL_Texture *texture = IMG_LoadTexture(renderer, filename.c_str());
+    std::string path = "..\\content\\" + file;
+    SDL_Texture *texture = IMG_LoadTexture(renderer, path.c_str());
     if (texture == nullptr)
     {
         logSDLError(std::cerr, "IMG_LoadTexture");
         return texture;
     }
 
-    std::cout << "Loaded texture: " << file << std::endl;
+    std::cout << "IMG_LoadTexture (" << path << ") ok!" << std::endl;
     return texture;
 }
 
 /**
-* Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving the
-* texture's width and height
+* Render SDL_Texture.
 */
-void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
+void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, int width, int height)
 {
     SDL_Rect destination;
     destination.x = x;
     destination.y = y;
+    destination.w = width;
+    destination.h = height;
 
-    SDL_QueryTexture(texture, NULL, NULL, &destination.w, &destination.h);
     SDL_RenderCopy(renderer, texture, NULL, &destination);
+}
+
+/**
+* Render SDL_Texture with original width and height intact.
+*/
+void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
+{
+    int width, height;
+    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+
+    renderTexture(texture, renderer, x, y, width, height);
 }
 
 
@@ -61,6 +72,16 @@ int main()
         logSDLError(std::cerr, "SDL_Init");
         return 1;
     }
+    std::cout << "SDL_Init ok!" << std::endl;
+
+    // Initialize SDL_image.
+    if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG)
+    {
+        logSDLError(std::cerr, "IMG_Init");
+        SDL_Quit();
+        return 1;
+    }
+    std::cout << "IMG_Init ok!" << std::endl;
 
     // Create window.
     SDL_Window *window = SDL_CreateWindow(
@@ -74,6 +95,7 @@ int main()
         SDL_Quit();
         return 1;
     }
+    std::cout << "SDL_CreateWindow ok!" << std::endl;
 
     // Create renderer.
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -86,10 +108,12 @@ int main()
         SDL_Quit();
         return 1;
     }
+    std::cout << "SDL_CreateRenderer ok!" << std::endl;
 
     // Load bitmap.
     SDL_Texture *texture = loadTexture("hello.bmp", renderer);
-    if (texture == nullptr)
+    SDL_Texture *texture2 = loadTexture("hello3.png", renderer);
+    if (texture == nullptr || texture2 == nullptr)
     {
         cleanup(renderer, window);
         SDL_Quit();
@@ -101,12 +125,13 @@ int main()
     {
         SDL_RenderClear(renderer);
         renderTexture(texture, renderer, 170, 90);
+        renderTexture(texture2, renderer, 170, 90);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
     }
 
     // Clean up.
-    cleanup(texture, renderer, window);
+    cleanup(texture, texture2, renderer, window);
     SDL_Quit();
     return 0;
 }
