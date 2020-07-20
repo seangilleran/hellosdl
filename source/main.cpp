@@ -9,7 +9,7 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-/*
+/**
  * Log SDL_GetError() to specified output stream.
  */
 void logSDLError(std::ostream &os, const std::string &msg)
@@ -17,11 +17,8 @@ void logSDLError(std::ostream &os, const std::string &msg)
     os << msg << " error: " << SDL_GetError() << std::endl;
 }
 
-/*
+/**
  * Load texture from a BMP file.
- * @param file BMP file to load.
- * @param renderer Renderer to load texture onto.
- * @return Loaded texture, or nullptr if something went wrong.
  */
 SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
 {
@@ -50,8 +47,6 @@ SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
 /**
 * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving the
 * texture's width and height
-* @param tex Source texture
-* @param ren Target renderer
 */
 void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
 {
@@ -63,7 +58,21 @@ void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
     SDL_RenderCopy(renderer, texture, NULL, &destination);
 }
 
-/*
+/**
+ * Tile texture to fit screen.
+ */
+void tileTexture(SDL_Texture *texture, SDL_Renderer *renderer)
+{
+    int width, height;
+    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+    renderTexture(texture, renderer, 0, 0);
+    renderTexture(texture, renderer, width, 0);
+    renderTexture(texture, renderer, 0, height);
+    renderTexture(texture, renderer, width, height);
+}
+
+
+/**
  * Application entry point.
  */
 int main()
@@ -101,9 +110,9 @@ int main()
     }
 
     // Load bitmap.
-    std::string bmpFile = "hello.bmp";
-    SDL_Texture *texture = loadTexture(bmpFile, renderer);
-    if (texture == nullptr)
+    SDL_Texture *background = loadTexture("hello2.bmp", renderer);
+    SDL_Texture *texture = loadTexture("hello.bmp", renderer);
+    if (background == nullptr || texture == nullptr)
     {
         cleanup(renderer, window);
         SDL_Quit();
@@ -114,13 +123,14 @@ int main()
     for (auto i = 0; i < 3; ++i)
     {
         SDL_RenderClear(renderer);
-        renderTexture(texture, renderer, 0, 0);
+        tileTexture(background, renderer);
+        renderTexture(texture, renderer, 170, 90);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
     }
 
     // Clean up.
-    cleanup(texture, renderer, window);
+    cleanup(background, texture, renderer, window);
     SDL_Quit();
     return 0;
 }
