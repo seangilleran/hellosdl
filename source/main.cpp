@@ -6,14 +6,20 @@
 
 #include "cleanup.h"
 
-using std::cerr, std::endl, std::string;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+
+void logSDLError(std::ostream &os, const std::string &msg)
+{
+    os << msg << " error: " << SDL_GetError() << std::endl;
+}
 
 int main()
 {
     // Initialize SDL.
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        cerr << "SDL_Init Error: " << SDL_GetError() << endl;
+        logSDLError(std::cerr, "SDL_Init");
         return 1;
     }
 
@@ -21,11 +27,11 @@ int main()
     SDL_Window *window = SDL_CreateWindow(
         "HelloSDL",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        640, 480,
+        SCREEN_WIDTH, SCREEN_HEIGHT,
         SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
-        cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
+        logSDLError(std::cerr, "SDL_CreateWindow");
         SDL_Quit();
         return 1;
     }
@@ -38,18 +44,18 @@ int main()
     if (renderer == nullptr)
     {
         cleanup(window);
-        cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+        logSDLError(std::cerr, "SDL_CreateRenderer");
         SDL_Quit();
         return 1;
     }
 
     // Load bitmap.
-    string imagePath = "..\\content\\hello.bmp";
+    std::string imagePath = "..\\content\\hello.bmp";
     SDL_Surface *bmp = SDL_LoadBMP(imagePath.c_str());
     if (bmp == nullptr)
     {
         cleanup(renderer, window);
-        cerr << "SDL_LoadBMP Error: " << SDL_GetError() << endl;
+        logSDLError(std::cerr, "SDL_LoadBMP");
         SDL_Quit();
         return 1;
     }
@@ -60,7 +66,7 @@ int main()
     if (texture == nullptr)
     {
         cleanup(renderer, window);
-        cerr << "SDL_CreateTextureFromSurfaceError: " << SDL_GetError() << endl;
+        logSDLError(std::cerr, "SDL_LoadTextureFromSurface");
         SDL_Quit();
         return 1;
     }
