@@ -47,6 +47,22 @@ SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
     return texture;
 }
 
+/**
+* Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving the
+* texture's width and height
+* @param tex Source texture
+* @param ren Target renderer
+*/
+void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
+{
+    SDL_Rect destination;
+    destination.x = x;
+    destination.y = y;
+
+    SDL_QueryTexture(texture, NULL, NULL, &destination.w, &destination.h);
+    SDL_RenderCopy(renderer, texture, NULL, &destination);
+}
+
 /*
  * Application entry point.
  */
@@ -98,7 +114,7 @@ int main()
     for (auto i = 0; i < 3; ++i)
     {
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        renderTexture(texture, renderer, 0, 0);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
     }
