@@ -4,6 +4,8 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 
+#include "cleanup.h"
+
 using std::cerr, std::endl, std::string;
 
 int main()
@@ -35,7 +37,7 @@ int main()
     );
     if (renderer == nullptr)
     {
-        SDL_DestroyWindow(window);
+        cleanup(window);
         cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
         SDL_Quit();
         return 1;
@@ -46,8 +48,7 @@ int main()
     SDL_Surface *bmp = SDL_LoadBMP(imagePath.c_str());
     if (bmp == nullptr)
     {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        cleanup(renderer, window);
         cerr << "SDL_LoadBMP Error: " << SDL_GetError() << endl;
         SDL_Quit();
         return 1;
@@ -58,8 +59,7 @@ int main()
     SDL_FreeSurface(bmp);
     if (texture == nullptr)
     {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        cleanup(renderer, window);
         cerr << "SDL_CreateTextureFromSurfaceError: " << SDL_GetError() << endl;
         SDL_Quit();
         return 1;
@@ -75,9 +75,7 @@ int main()
     }
 
     // Clean up.
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    cleanup(texture, renderer, window);
     SDL_Quit();
     return 0;
 }
