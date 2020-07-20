@@ -9,11 +9,47 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+/*
+ * Log SDL_GetError() to specified output stream.
+ */
 void logSDLError(std::ostream &os, const std::string &msg)
 {
     os << msg << " error: " << SDL_GetError() << std::endl;
 }
 
+/*
+ * Load texture from a BMP file.
+ * @param file BMP file to load.
+ * @param renderer Renderer to load texture onto.
+ * @return Loaded texture, or nullptr if something went wrong.
+ */
+SDL_Texture *loadTexture(const std::string &file, SDL_Renderer *renderer)
+{
+    SDL_Texture *texture = nullptr;
+
+    std::string filename = "..\\content\\" + file;
+    SDL_Surface *bmp = SDL_LoadBMP(filename.c_str());
+    if (bmp == nullptr)
+    {
+        logSDLError(std::cerr, "SDL_LoadBMP");
+        return texture;
+    }
+
+    texture = SDL_CreateTextureFromSurface(renderer, bmp);
+    SDL_FreeSurface(bmp);
+    if (texture == nullptr)
+    {
+        logSDLError(std::cerr, "SDL_CreateTextureFromRenderer");
+        return texture;
+    }
+
+    std::cout << "Loaded texture: " << file << std::endl;
+    return texture;
+}
+
+/*
+ * Application entry point.
+ */
 int main()
 {
     // Initialize SDL.
@@ -39,8 +75,7 @@ int main()
     // Create renderer.
     SDL_Renderer *renderer = SDL_CreateRenderer(
         window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-    );
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == nullptr)
     {
         cleanup(window);
@@ -50,23 +85,11 @@ int main()
     }
 
     // Load bitmap.
-    std::string imagePath = "..\\content\\hello.bmp";
-    SDL_Surface *bmp = SDL_LoadBMP(imagePath.c_str());
-    if (bmp == nullptr)
-    {
-        cleanup(renderer, window);
-        logSDLError(std::cerr, "SDL_LoadBMP");
-        SDL_Quit();
-        return 1;
-    }
-
-    // Upload bitmap to renderer.
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, bmp);
-    SDL_FreeSurface(bmp);
+    std::string bmpFile = "hello.bmp";
+    SDL_Texture *texture = loadTexture(bmpFile, renderer);
     if (texture == nullptr)
     {
         cleanup(renderer, window);
-        logSDLError(std::cerr, "SDL_LoadTextureFromSurface");
         SDL_Quit();
         return 1;
     }
