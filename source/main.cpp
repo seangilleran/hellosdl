@@ -60,7 +60,6 @@ void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
     renderTexture(texture, renderer, x, y, width, height);
 }
 
-
 /**
  * Application entry point.
  */
@@ -120,14 +119,31 @@ int main()
         return 1;
     }
 
-    // Draw texture to window.
-    for (auto i = 0; i < 3; ++i)
+    // Event loop.
+    SDL_Event e;
+    bool isRunning = true;
+    while (isRunning)
     {
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                isRunning = false;
+            }
+            if (e.type == SDL_KEYDOWN)
+            {
+                isRunning = false;
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                isRunning = false;
+            }
+        }
+
         SDL_RenderClear(renderer);
         renderTexture(texture, renderer, 170, 90);
         renderTexture(texture2, renderer, 170, 90);
         SDL_RenderPresent(renderer);
-        SDL_Delay(1000);
     }
 
     // Clean up.
